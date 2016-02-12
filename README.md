@@ -26,4 +26,4 @@ finally:
 * Add more output modes.
 * XML coming soon.
 * Move dmidecode path discovery out of __init__ and replace with hardcoded common RHEL/CentOS path + new method to run path discovery.
-* Add support for pushing to a database or other remote datastore
+* Add support for output of std. SQL.
