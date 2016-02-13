@@ -17,13 +17,19 @@ myhostinfo = a.decode()
 ###Dump a JSON of the same dict
 ```
 try:
-  open("myjsonfile", "w")
+  open("mydmi.json", "w")
   a.dumpjson("w")
 finally:
-  close("myjsonfile")
+  close("mydmi.json")
+```
+###Dump an XML of the dict
+```
+try:
+  open("mydmi.xml", "w")
+  a.dumpxml("w")
+finally:
+  close("mydmi.xml")
 ```
 ##TODO:
-* Add more output modes.
-* XML coming soon.
-* Move dmidecode path discovery out of __init__ and replace with hardcoded common RHEL/CentOS path + new method to run path discovery.
+* Move dmidecode path discovery out of __init__ and replace with hardcoded /usr/sbin; add new method to run path discovery.
 * Add support for output of std. SQL.
