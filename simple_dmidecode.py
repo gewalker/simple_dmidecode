@@ -5,6 +5,8 @@ import subprocess
 import string
 import json
 import sys
+import xml.etree.ElementTree as ET
+from xml.dom import minidom
 
 
 class Dmi:
@@ -44,3 +46,33 @@ class Dmi:
         If no filehandle is specified, dump to stdout.
         """
         handle.write(json.dumps(self.dmidict, indent=4, separators=(',', ': ')))
+
+    def dumpxml(self, handle=sys.stdout):
+        """XML output method.
+
+        Build an XML document around the DMI information organized by category.
+        If no filehandle is specified, dump the XML document to stdout.
+        """
+        # Create the root and SubElements of the XML tree.
+        root = ET.Element("DMI")
+        bios = ET.SubElement(root, "bios")
+        system = ET.SubElement(root, "system")
+        baseboard = ET.SubElement(root, "baseboard")
+        chassis = ET.SubElement(root, "chassis")
+        processor = ET.SubElement(root, "processor")
+        # For each SubElement, walk through the dict keys and assign attributes to the SubElements.
+        for key in self.dmidict.keys():
+            if key.startswith("bios"):
+                bios.set(key[5:], self.dmidict[key])
+            elif key.startswith("system"):
+                system.set(key[7:], self.dmidict[key])
+            elif key.startswith("baseboard"):
+                baseboard.set(key[10:], self.dmidict[key])
+            elif key.startswith("chassis"):
+                chassis.set(key[8:], self.dmidict[key])
+            elif key.startswith("processor"):
+                processor.set(key[10:], self.dmidict[key])
+        tree = ET.ElementTree(root)
+        ugly = ET.tostring(root, "utf-8")
+        gugly = minidom.parseString(ugly)
+        handle.write(gugly.toprettyxml(indent="    "))
