@@ -44,14 +44,21 @@ class Dmi:
 
         Dump the contents of the self.dmidict to a file in JSON format.
         If no filehandle is specified, dump to stdout.
+        If "None" is specified, no output will be written.
+        Return is a string object containing the json formatted output.
         """
-        handle.write(json.dumps(self.dmidict, indent=4, separators=(',', ': ')))
+        output = json.dumps(self.dmidict, indent=4, separators=(',', ': '))
+        if handle is not None:
+            handle.write(output)
+        return output
 
     def dumpxml(self, handle=sys.stdout):
         """XML output method.
 
         Build an XML document around the DMI information organized by category.
         If no filehandle is specified, dump the XML document to stdout.
+        If "None" is specified as the filehandle, no output will be written.
+        Return value is an xml.etree.ElementTree.ElementTree object containing the XML.
         """
         # Create the root and SubElements of the XML tree.
         root = ET.Element("DMI")
@@ -73,6 +80,53 @@ class Dmi:
             elif key.startswith("processor"):
                 processor.set(key[10:], self.dmidict[key])
         tree = ET.ElementTree(root)
-        ugly = ET.tostring(root, "utf-8")
-        gugly = minidom.parseString(ugly)
-        handle.write(gugly.toprettyxml(indent="    "))
+        if handle is not None:
+            ugly = ET.tostring(root, "utf-8")
+            gugly = minidom.parseString(ugly)
+            handle.write(gugly.toprettyxml(indent="    "))
+        return tree
+
+    def dumpsql(self, table, uidcol, uidval, mode, keylist=None):
+        """SQL output method.
+
+        For obvious reasons, SQL output is going to be a little different.
+        The goal here is a method which, given a table name and an ID (column and value) as input, will generate SQL
+        to insert or update the row identified by that ID in the table indicated.
+        If all keys are not wanted, a list object containing the desired keys in the desired order can be
+        passed as well. Otherwise the dmikeys list is used.
+        Return value is a string containing the constructed SQL.
+        """
+        # Initialize the SQL string.
+        if upper(mode) not in ["UPDATE", "INSERT"]:
+            raise ValueError("Only UPDATE and INSERT methods are supported.\n")
+        mode = upper(mode)
+        # Set the default keylist value to self.dmikeys.
+        if keylist is None:
+            keylist = self.dmikeys
+        # Iterate over the keylist and make sure that all of the keys are legal dmidecode keywords.
+        for key in keylist:
+            if key not in self.dmikeys:
+                raise ValueError("Unknown keyword " + str(key) + "in keylist.\n")
+        # Execute INSERT mode logic.
+        if mode == "INSERT":
+            keystr = "'" + uidcol + "'" + str(keylist).strip("[]")
+            valstr = "'" + str(uidval) + "', "
+            for key in range(0, len(keylist)-2):
+                key = keylist[key]
+                valstr = valstr + "'" + self.dmidict[key] + "', "
+            key = keylist[len(keylist)-1]
+            valstr = valstr + "'" + self.dmidict[key] + "')"
+            sqlstmt = "INSERT into " + table + " (" + keystr + ") VALUES (" + valstr
+            print(sqlstmt)
+            return(sqlstmt)
+        # Or UPDATE mode logic.
+        else:
+            sqlstmt = mode + " " + table + " SET ("
+            for key in range(0, len(keylist)-2):
+                key = keylist[key]
+                sqlstmt = sqlstmt + key + '="' + self.dmidict[key] + '", '
+            key = keylist[(len(keylist)-1)]
+            sqlstmt = sqlstmt + key + '="' + self.dmidict[key] + '") '
+            sqlstmt = sqlstmt + "WHERE " + str(uidcol) + "=" + str(uidval) + ";"
+            print(sqlstmt)
+            return(sqlstmt)
