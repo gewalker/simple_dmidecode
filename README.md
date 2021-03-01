@@ -7,14 +7,14 @@ simple_dmidecode.  Simple_dmidecode throws out tons of functionality in favor of
 to most system administrators. Dmidecode already supports this approach in their 22 core keywords...and those core
 keywords are exactly what simple_dmidecode supports.  Those and nothing else. Want something else?  Use something else.
 
-##Usage:
-###Return a dict containing the dmidecode outputs
+## Usage:
+### Return a dict containing the dmidecode outputs
 ```
 from simple_dmidecode import Dmi
 a = Dmi()
 myhostinfo = a.decode()
 ```
-###Dump a JSON of the same dict
+### Dump a JSON of the same dict
 ```
 myhostinfo = a.decode()
 try:
@@ -26,7 +26,7 @@ finally:
 If no filehandle is passed to dumpjson(), the output will be sent to sys.stdout.
 If "None" is passed to dumpjson(), no output will be printed.
 The method returns a string containing the JSON-formatted data.
-###Dump an XML of the dict
+### Dump an XML of the dict
 ```
 myhostinfo = a.decode()
 try:
@@ -39,7 +39,7 @@ As with JSON, if no filehandle is passed, the output is prettified with xml.dom.
 If "None" is passed as the filehandle, no printed output is produced.
 The method returns an xml.etree.ElementTree.ElementTree object containing the constructed data.
 Please be aware that xml.etree.ElementTree is vulnerable to a number of anti-XML parser attacks.  Program accordingly.
-###SQL constructor
+### SQL constructor
 ```
 myhostinfo = a.decode()
 myinsertsql = a.dumpsql("MYTABLE", "MY_PK", THIS_PKVALUE, "INSERT", list_of_keys_i_want)
@@ -49,5 +49,5 @@ Basic SQL INSERT/UPDATE constructor. If you give it a table, a primary key colum
 and (optionally) a list containing the keywords you want it to pull for you, it will return a string containing
 reasonably well-formatted SQL to insert or update that row.
 It is left as an exercise for the user to validate that SQL, make sure it doesn't do something horrible, etc.
-##TODO:
+## TODO:
 * Move dmidecode path discovery out of __init__ and replace with hardcoded /usr/sbin; add new method to run path discovery.
