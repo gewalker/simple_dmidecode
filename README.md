@@ -1,4 +1,4 @@
-#simple_dmidecode
+# simple dmidecode
 If you're like me, and I know I am, part of your job involves doing things on, near, or to servers. One of the better
 tools out there for getting information about your server is dmidecode, the handy program that decodes a system's
 Desktop Management Interface information...most of which is totally useless to you. Sadly, recognition of that last
